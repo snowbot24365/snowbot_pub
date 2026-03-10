@@ -6,18 +6,11 @@ from yaml.loader import SafeLoader
 from scheduler.task_manager import SchedulerService
 import platform
 from core.definition import MarketType
-from PIL import Image
 from pathlib import Path
-import base64
 from datetime import datetime
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-
-def get_img_as_base64(file_path):
-    with open(file_path, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
 
 def load_auth_config():
     try:
@@ -35,21 +28,10 @@ def init_scheduler():
     manager.start()
     return manager
 
-def run_snowbot():
-    ICON_PATH = ROOT_DIR / "icon.ico"
-    page_icon_img = "📈"
-
-    if ICON_PATH.exists():
-        try:
-            page_icon_img = Image.open(ICON_PATH)
-        except Exception as e:
-            print(f"⚠️ 아이콘 로드 실패: {e}")
-    else:
-        print(f"⚠️ 아이콘 파일을 찾을 수 없음: {ICON_PATH}")
-
+def run():
     st.set_page_config(
-        page_title="SnowBot",
-        page_icon=page_icon_img,
+        page_title="한국/미국 주식자동매매프로그램",
+        page_icon="📈",
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -99,7 +81,7 @@ def run_snowbot():
     if platform.system() == 'Linux':
         auth_enabled = True
 
-    name = "snowbot"
+    name = "admin"
     authenticator = None
 
     if auth_enabled:
@@ -133,21 +115,6 @@ def run_snowbot():
     allowed_markets = [MarketType.KR, MarketType.US]
 
     with st.sidebar:
-        if ICON_PATH.exists():
-            try:
-                icon_b64 = get_img_as_base64(ICON_PATH)
-                st.markdown(f"""
-                    <h1 style='display: inline-block;'>
-                        <img src="data:image/x-icon;base64,{icon_b64}"
-                            style="width: 35px; height: 35px; vertical-align: -10px; margin-right: 1px;">
-                        SnowBot
-                    </h1>
-                """, unsafe_allow_html=True)
-            except Exception:
-                st.title("📈 SnowBot")
-        else:
-            st.title("📈 SnowBot")
-
         if auth_enabled and authenticator:
             try:
                 authenticator.logout(location='sidebar')

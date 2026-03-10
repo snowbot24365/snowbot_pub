@@ -1,6 +1,3 @@
-"""
-SnowBot - 메인 앱
-"""
 import streamlit as st
 from ui import main_impl
 
@@ -15,4 +12,4 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main_impl.run_snowbot()
+    main_impl.run()
