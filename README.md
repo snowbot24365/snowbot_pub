@@ -8,8 +8,7 @@
 ### 1. 🌏 멀티 마켓 지원 (Multi-Market)
 
 * **한국 주식 (KR)**: KOSPI, KOSDAQ 전 종목 지원 (OpenDart 재무 데이터 + KIS 시세)
-* **미국 주식 (US)**: NASDAQ, NYSE 등 주요 종목 지원 (`yfinance` 데이터 + KIS 해외주식 거래)
-* **라이선스 관리**: 사용자 권한에 따라 접속 가능한 시장(Market) 자동 분기 처리
+* **미국 주식 (US)**: NASDAQ, NYSE, AMEX 등 주요 종목 지원 (`yfinance` 데이터 + KIS 해외주식 거래)
 
 ### 2. 📥 데이터 수집 (Data Collection)
 
@@ -35,8 +34,7 @@
 
 ### 5. 🔒 보안 및 편의성
 
-* **로그인 시스템**: `Streamlit-Authenticator` 기반의 보안 접속 (설정 가능)
-* **원클릭 실행**: 윈도우 환경을 위한 `install.bat`, `run.bat` 스크립트 제공
+* **로그인 시스템**: `Streamlit-Authenticator` 기반의 보안 접속 (설정 가능, Linux 환경에서 강제 적용)
 * **스케줄러**: 장 마감 후 수집, 장 중 매매 등을 백그라운드에서 자동 수행 (`APScheduler`)
 
 ---
@@ -47,15 +45,11 @@
 * **Web Framework**: Streamlit
 * **Authentication**: Streamlit Authenticator
 * **Database**:
-* **Local**: SQLite (`stock_data.db`)
-* **Cloud**: Oracle Autonomous Database (ATP)
-
-
+  * **Local**: SQLite (`stock_data.db`)
+  * **Cloud**: Oracle Autonomous Database (ATP)
 * **Data & API**:
-* **Korea**: OpenDartReader, FinanceDataReader, KIS API (Domestic)
-* **USA**: yfinance, KIS API (Overseas)
-
-
+  * **Korea**: OpenDartReader, FinanceDataReader, KIS API (Domestic)
+  * **USA**: yfinance, KIS API (Overseas)
 * **ORM**: SQLAlchemy
 * **Scheduler**: APScheduler
 
@@ -63,42 +57,39 @@
 
 ## 📂 프로젝트 구조
 
-```bash
-snowbot/
-├── main.py                 # 앱 진입점 (시장 선택 및 인증)
-├── install.bat             # [Windows] 자동 설치 스크립트
-├── run.bat                 # [Windows] 실행 스크립트
+```
+snowbot_pub/
+├── main.py                 # 앱 진입점
 ├── requirements.txt        # 의존성 패키지 목록
-├── config/                 # 설정 및 라이선스
+├── config/                 # 설정 관리
 │   ├── settings.py         # 환경 설정 로더
-│   └── license_manager.py  # 시장 접근 권한 관리
+│   └── database.py         # DB 모델 및 세션 관리
 ├── core/                   # 핵심 추상 클래스 (Trader, Fetcher)
-├── data/                   # 데이터 수집 공통 로직
-├── impl/                   # 시장별 구현체 (Implementation)
+├── data/                   # 데이터 수집 로직
+│   ├── kr/                 # 한국 주식 데이터 수집
+│   └── us/                 # 미국 주식 데이터 수집
+├── impl/                   # 시장별 구현체
 │   ├── kr/                 # 한국 시장용 Fetcher/Trader
 │   └── us/                 # 미국 시장용 Fetcher/Trader
 ├── trading/                # 트레이딩 엔진 (Simulation, AutoTrader)
 ├── scheduler/              # 작업 스케줄 관리
 ├── ui/                     # Streamlit 페이지
 │   ├── dashboard.py        # 통합 대시보드
-│   ├── trading_page.py     # 시장별 매매 현황
-│   └── ...
+│   ├── auto_trading_page.py
+│   ├── manual_trading_page.py
+│   ├── evaluation_page.py
+│   ├── data_collection_page.py
+│   ├── favorite_page.py
+│   ├── settings_page.py
+│   └── main_impl.py        # 앱 레이아웃 및 라우팅
 └── utils/                  # 로거, 토큰 관리 등 유틸리티
-
 ```
 
 ---
 
 ## 🚀 설치 및 실행
 
-### 방법 A. 윈도우 간편 설치 (권장)
-
-제공되는 배치 파일을 이용하면 복잡한 명령어 없이 설치가 가능합니다.
-
-1. **설치**: `install.bat` 파일을 더블 클릭하여 실행합니다. (가상환경 생성 및 라이브러리 설치가 자동으로 진행됩니다.)
-2. **실행**: 설치가 완료되면 `run.bat` 파일을 더블 클릭하여 SnowBot을 시작합니다.
-
-### 방법 B. 수동 설치
+### 1. 가상환경 생성 및 패키지 설치
 
 ```bash
 # 가상환경 생성
@@ -112,11 +103,15 @@ source venv/bin/activate
 
 # 패키지 설치
 pip install -r requirements.txt
-
-# 실행
-streamlit run main.py
-
 ```
+
+### 2. 실행
+
+```bash
+streamlit run main.py
+```
+
+브라우저에서 `http://localhost:8501` 으로 접속합니다.
 
 ---
 
@@ -124,21 +119,31 @@ streamlit run main.py
 
 ### 1. `config_data/settings.json`
 
-최초 실행 시 `config_data/` 폴더에 설정 파일이 생성됩니다. UI의 **설정 페이지**에서도 수정할 수 있습니다.
+최초 실행 시 `config_data/` 폴더에 설정 파일이 자동 생성됩니다. UI의 **설정 페이지**에서도 수정할 수 있습니다.
 
 * **API Keys**:
-* **OpenDart**: 한국 기업 재무 데이터 조회용
-* **KIS API**: 한국투자증권 (국내/해외 계좌 별도 설정 필요)
-
+  * **OpenDart**: 한국 기업 재무 데이터 조회용
+  * **KIS API**: 한국투자증권 (국내/해외 계좌 별도 설정 필요)
 
 * **Execution Mode**:
-* 한국(KR)과 미국(US) 각각 `Simulation`, `Real Trading` 모드를 다르게 설정할 수 있습니다.
-
-
+  * 한국(KR)과 미국(US) 각각 `Simulation`, `Mock`, `Real` 모드를 독립적으로 설정할 수 있습니다.
 
 ### 2. `config_data/auth.yaml` (선택 사항)
 
-로그인 기능을 사용하려면 인증 설정 파일을 구성해야 합니다. (Linux 환경에서는 강제 적용)
+로그인 기능을 사용하려면 인증 설정 파일을 구성해야 합니다. Linux 환경에서는 강제 적용됩니다.
+
+```yaml
+enabled: true
+credentials:
+  usernames:
+    admin:
+      name: Admin
+      password: <bcrypt-hashed-password>
+cookie:
+  name: snowbot_cookie
+  key: <random-secret-key>
+  expiry_days: 30
+```
 
 ---
 
@@ -146,7 +151,7 @@ streamlit run main.py
 
 1. **투자 책임**: 본 시스템은 알고리즘 학습 및 연구용으로 개발되었습니다. 실제 투자로 인한 손실의 책임은 전적으로 사용자에게 있습니다.
 2. **해외 주식 시세**: 미국 주식 실시간 시세 이용 시 한국투자증권의 **실시간 시세 신청**이 필요할 수 있습니다.
-3. **보안**: API Key와 Oracle Wallet 등 민감 정보가 포함된 파일은 절대 외부에 노출되지 않도록 주의하십시오.
+3. **보안**: API Key, Oracle Wallet 등 민감 정보가 포함된 `config_data/`, `wallet/` 폴더는 절대 외부에 노출되지 않도록 주의하십시오. (`.gitignore`에 의해 git 추적 제외됨)
 
 ---
 
