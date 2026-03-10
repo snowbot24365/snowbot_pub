@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# 빌드 / 배포
+dist/
+build/
+*.egg-info/
+
+# 환경 설정
+.env
+*.env
+
+# 로그
+logs/
+*.log
+
+# 라이선스 키 (민감 정보)
+license.key
+
+# 설정 및 지갑 데이터 (민감 정보)
+config_data/
+wallet/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
