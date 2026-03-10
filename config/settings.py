@@ -1,7 +1,6 @@
 """
-설정 관리 모듈 (Refactored for KR/US Hybrid - Full Separation)
-- 환경별(Local/Production) 설정 분리
-- 시장별(KR/US) 설정 완전 분리 (API Key, Mode, Trading, Evaluation)
+설정 관리 모듈
+- 시장별(KR/US) 설정 분리 (API Key, Mode, Trading, Evaluation)
 - JSON 파일 기반 영구 저장
 """
 
@@ -12,16 +11,8 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from datetime import datetime
-import sys
 
-# [중요] 실행 환경에 따른 기본 경로(Base Directory) 찾기
-if getattr(sys, 'frozen', False):
-    # 1. EXE 실행 모드: 실행 파일(.exe)이 있는 폴더를 기준(ROOT)으로 잡음
-    ROOT_DIR = Path(sys.executable).parent
-else:
-    # 2. 개발(Script) 모드: 현재 파일의 위치를 기준으로 상위 폴더를 잡음
-    # (기존 코드: Path(__file__).parent.parent)
-    ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 # 설정 파일 경로
 CONFIG_DIR = ROOT_DIR / "config_data"

@@ -34,7 +34,7 @@ class FnGuideFetcher:
             # 문자열로 변환 및 콤마 제거
             str_val = str(value).replace(',', '')
             
-            # [핵심] 정규식으로 숫자(음수 포함, 소수점 포함)만 추출
+            # 정규식으로 숫자(음수 포함, 소수점 포함)만 추출
             # -?: 마이너스 부호가 있을 수도 있음
             # \d+: 숫자 1개 이상
             # (\.\d+)?: 소수점과 그 뒤의 숫자가 있을 수도 있음
@@ -68,7 +68,7 @@ class FnGuideFetcher:
             url_main = f"https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&gicode=A{stock_code}&NewMenuID=101"
 
             # =========================================================
-            # [핵심] 인덱스 검색 헬퍼 함수 (내부 함수로 정의)
+            # 인덱스 검색 헬퍼 함수 (내부 함수로 정의)
             # =========================================================
             def find_series(df, keyword):
                 """

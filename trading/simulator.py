@@ -1,6 +1,6 @@
 """
-시뮬레이션 엔진 (KR/US 분리 적용)
-- 가상 계좌 관리 (시장별 분리)
+시뮬레이션 엔진
+- 가상 계좌 관리 (KR/US 시장별 분리)
 - 가상 매수/매도 처리
 - 수수료, 세금 계산 (시장별 설정 적용)
 """
@@ -17,7 +17,6 @@ from config.database import (
     get_session, VirtualAccount, VirtualHolding, 
     TradeHistory, ItemMst
 )
-# [수정] 시장별 Fetcher 임포트
 from impl.kr.kr_fetcher import KrFetcher
 from impl.us.us_fetcher import UsFetcher
 
@@ -33,7 +32,7 @@ class OrderResult:
     item_nm: str = ""
     order_type: str = ""  # 'B' or 'S'
     qty: int = 0
-    price: float = 0.0    # [수정] US는 소수점이 있으므로 float 권장
+    price: float = 0.0    # US는 소수점이 있으므로 float 권장
     amount: float = 0.0
     fee: float = 0.0
     tax: float = 0.0
@@ -79,7 +78,7 @@ class SimulationEngine:
         self.market_type = market_type
         self.settings_manager = get_settings_manager()
         
-        # [수정] 시장별 Fetcher 및 설정 로드
+        # 시장별 Fetcher 및 설정 로드
         if self.market_type == "US":
             self.fetcher = UsFetcher()
             self.trading_settings = self.settings_manager.settings.trading.us
@@ -93,7 +92,7 @@ class SimulationEngine:
     def _initialize_account(self):
         """가상 계좌 초기화 (시장별)"""
         with get_session() as session:
-            # [수정] market_type 필터 추가
+            # market_type 필터 추가
             account = session.query(VirtualAccount).filter_by(market_type=self.market_type).first()
             
             if not account:
@@ -106,13 +105,13 @@ class SimulationEngine:
                     total_profit_rate=0.0
                 )
                 session.add(account)
-                session.commit() # [수정] 즉시 커밋하여 생성 보장
+                session.commit() # 즉시 커밋하여 생성 보장
                 logger.info(f"[{self.market_type}] 가상 계좌 초기화: {initial_balance:,.2f}")
     
     def get_account_info(self) -> AccountInfo:
         """계좌 정보 조회"""
         with get_session() as session:
-            # [수정] market_type 필터 추가
+            # market_type 필터 추가
             account = session.query(VirtualAccount).filter_by(market_type=self.market_type).first()
             holdings = session.query(VirtualHolding).filter_by(market_type=self.market_type).all()
             
@@ -125,7 +124,7 @@ class SimulationEngine:
                 # 현재가 업데이트
                 price_info = self.fetcher.get_current_price(h.item_cd)
                 
-                # [수정] 가격 정보 처리 (US 소수점 대응)
+                # 가격 정보 처리 (US 소수점 대응)
                 current_p = h.avg_price # 기본값
                 if price_info:
                     current_p = float(price_info.get('price', h.avg_price))
@@ -176,10 +175,10 @@ class SimulationEngine:
         initial_balance = self.trading_settings.initial_balance
         
         with get_session() as session:
-            # [수정] 해당 시장의 보유 종목만 삭제
+            # 해당 시장의 보유 종목만 삭제
             session.query(VirtualHolding).filter_by(market_type=self.market_type).delete()
             
-            # [수정] 해당 시장의 계좌만 초기화
+            # 해당 시장의 계좌만 초기화
             account = session.query(VirtualAccount).filter_by(market_type=self.market_type).first()
             if account:
                 account.balance = initial_balance
@@ -254,7 +253,7 @@ class SimulationEngine:
                 # 5. 보유 종목 업데이트
                 holding = session.query(VirtualHolding).filter(
                     VirtualHolding.item_cd == item_cd,
-                    VirtualHolding.market_type == self.market_type # [수정] 시장 필터
+                    VirtualHolding.market_type == self.market_type # 시장 필터
                 ).first()
                 
                 today_str = date.today().strftime('%Y%m%d')
@@ -265,7 +264,7 @@ class SimulationEngine:
                     total_cost_old = holding.quantity * float(holding.avg_price)
                     total_cost_new = result.amount
                     
-                    # [수정] 평균단가 소수점 처리 (US 대응)
+                    # 평균단가 소수점 처리 (US 대응)
                     new_avg = (total_cost_old + total_cost_new) / total_qty
                     
                     holding.avg_price = new_avg
@@ -275,7 +274,7 @@ class SimulationEngine:
                 else:
                     # 신규 보유
                     holding = VirtualHolding(
-                        market_type=self.market_type, # [수정] 시장 정보 저장
+                        market_type=self.market_type, # 시장 정보 저장
                         item_cd=item_cd,
                         item_nm=item_nm,
                         quantity=qty,
@@ -309,8 +308,8 @@ class SimulationEngine:
                 history = TradeHistory(
                     market_type=self.market_type,
                     item_cd=item_cd,
-                    trade_date=local_date_str,  # [수정] 현지 날짜 (미국은 한국보다 하루 늦을 수 있음)
-                    trade_time=local_time_str,  # [수정] 현지 시간
+                    trade_date=local_date_str,  # 현지 날짜 (미국은 한국보다 하루 늦을 수 있음)
+                    trade_time=local_time_str,  # 현지 시간
                     trade_type='buy',
                     quantity=qty,
                     price=price,
@@ -326,7 +325,7 @@ class SimulationEngine:
                 result.order_no = order_no
                 result.message = f"매수 완료: {item_nm} {qty}주 @ {price:,.2f}"
                 
-                session.commit() # [수정] 전체 트랜잭션 커밋
+                session.commit() # 전체 트랜잭션 커밋
                 
                 logger.info(f"[{self.market_type}] {result.message}")
                 
@@ -347,7 +346,7 @@ class SimulationEngine:
                     duplicate_sell = session.query(TradeHistory).filter(
                         TradeHistory.trade_date == today,
                         TradeHistory.item_cd == item_cd,
-                        TradeHistory.market_type == self.market_type, # [수정] 시장 필터
+                        TradeHistory.market_type == self.market_type, # 시장 필터
                         TradeHistory.trade_type == 'sell',
                         TradeHistory.trade_source == 'auto'
                     ).first()
@@ -359,7 +358,7 @@ class SimulationEngine:
                 # 보유 종목 확인
                 holding = session.query(VirtualHolding).filter(
                     VirtualHolding.item_cd == item_cd,
-                    VirtualHolding.market_type == self.market_type # [수정] 시장 필터
+                    VirtualHolding.market_type == self.market_type # 시장 필터
                 ).first()
                 
                 if not holding:
@@ -428,7 +427,7 @@ class SimulationEngine:
                 local_time_str = local_dt.strftime('%H%M%S')
                 
                 history = TradeHistory(
-                    market_type=self.market_type, # [수정] 시장 필터
+                    market_type=self.market_type, # 시장 필터
                     item_cd=item_cd,
                     trade_date=local_date_str,
                     trade_time=local_time_str,
@@ -463,7 +462,7 @@ class SimulationEngine:
         with get_session() as session:
             holding = session.query(VirtualHolding).filter(
                 VirtualHolding.item_cd == item_cd,
-                VirtualHolding.market_type == self.market_type # [수정] 시장 필터
+                VirtualHolding.market_type == self.market_type # 시장 필터
             ).first()
             
             if not holding:
@@ -498,7 +497,7 @@ class SimulationEngine:
         """거래 이력 조회"""
         with get_session() as session:
             histories = session.query(TradeHistory).filter(
-                TradeHistory.market_type == self.market_type # [수정] 시장 필터
+                TradeHistory.market_type == self.market_type # 시장 필터
             ).order_by(
                 TradeHistory.trade_date.desc(),
                 TradeHistory.trade_time.desc()

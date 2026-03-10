@@ -130,7 +130,7 @@ class Evaluator:
             settings.weight_per + settings.weight_pbr
         )
         
-        # [핵심] 점수 정규화: (가중평균) * (항목 수 8)
+        # 점수 정규화: (가중평균) * (항목 수 8)
         # 이렇게 하면 가중치를 3.0으로 높여도 만점은 항상 40점으로 유지됨
         if total_weight > 0:
             final_score = (weighted_sum / total_weight) * 8
@@ -787,14 +787,14 @@ class EvaluationService:
             d.bsop_prfi_inrt = get_val(fs.bsop_prfi_inrt, 0.0)
             d.roe_val = get_val(fs.roe_val, 0.0)
             
-            # [중요] 부채비율은 None일 때만 999로 설정 (0%는 우량한 것이므로 유지)
+            # 부채비율은 None일 때만 999로 설정 (0%는 우량한 것이므로 유지)
             d.lblt_rate = get_val(fs.lblt_rate, 999.0) 
             d.thtr_ntin = get_val(fs.thtr_ntin, 0)
             d.rsrv_rate = get_val(fs.rsrv_rate, 0.0)
             
         if eq:
-            d.lstn_stcn = get_val(eq.lstn_stcn, 1)        # [추가] 상장주식수
-            d.frgn_hldn_qty = get_val(eq.frgn_hldn_qty, 0) # [추가] 외국인보유수량
+            d.lstn_stcn = get_val(eq.lstn_stcn, 1)        # 상장주식수
+            d.frgn_hldn_qty = get_val(eq.frgn_hldn_qty, 0) # 외국인보유수량
             d.frgn_ntby_qty = get_val(eq.frgn_ntby_qty, 0)
             d.pgtr_ntby_qty = get_val(eq.pgtr_ntby_qty, 0)
             d.hts_avls = get_val(eq.hts_avls, 0)

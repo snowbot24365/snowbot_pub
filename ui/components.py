@@ -657,7 +657,7 @@ def render_log_section(
                 if not summary_msg:
                     summary_msg = "(내용 없음)"
 
-                # [핵심] Expander의 라벨을 표의 행처럼 구성
+                # Expander의 라벨을 표의 행처럼 구성
                 # **굵게** 표시하거나 이모지를 섞어 가독성을 높임
                 # 예: ✅  02-05 10:00  |  매수주문  |  매수 주문이 성공적으로...
                 label = f"{emoji}  {time_str}  |  {log.schedule_name}  |  {summary_msg}"

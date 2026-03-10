@@ -148,7 +148,7 @@ def render_kis_import_section(settings_manager, current_market):
                             temp_kr = KrFetcher(mode=settings.kis_api_mode_kr)
                             stocks = temp_kr.get_kis_group_stocks(group_code)
                         
-                        # [핵심] 시장별 거래소 코드로 필터링
+                        # 시장별 거래소 코드로 필터링
                         filtered_stocks = [
                             s for s in stocks 
                             if s.get('exch_code') in target_exchanges

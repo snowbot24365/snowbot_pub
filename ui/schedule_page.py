@@ -241,7 +241,7 @@ def render_schedule(current_market: MarketType):
         
         st.markdown("#### 실행 시간 설정")
         
-        # [핵심] 시장/작업별 프리셋 자동 분기
+        # 시장/작업별 프리셋 자동 분기
         if task_type == TaskType.AUTO_TRADE:
             current_presets = AUTO_TRADE_PRESETS_KR if current_market == MarketType.KR else AUTO_TRADE_PRESETS_US
             info_msg = "평일 09:00 ~ 15:59 (KR)" if current_market == MarketType.KR else "평일 23:00 ~ 06:00 (US)"
@@ -273,7 +273,7 @@ def render_schedule(current_market: MarketType):
                         name=name, 
                         task_type=task_type, 
                         cron_expression=cron_expression, 
-                        market_type=market_str, # [중요] 현재 시장 정보 전달
+                        market_type=market_str, # 현재 시장 정보 전달
                         enabled=enabled
                     )
                     st.success(f"[{market_str}] '{name}' 스케줄이 추가되었습니다.")

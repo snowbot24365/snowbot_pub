@@ -7,31 +7,12 @@ from scheduler.task_manager import SchedulerService
 import platform
 from core.definition import MarketType
 from PIL import Image
-import sys
 from pathlib import Path
 import base64
 from datetime import datetime
 
 
-# ==========================================
-# [중요] 경로 계산 함수 개선
-# ==========================================
-def get_root_dir():
-    """
-    실행 환경(Dev/Nuitka/PyInstaller)에 맞춰 프로젝트 루트 경로를 반환합니다.
-    """
-    if getattr(sys, 'frozen', False):
-        # 1. PyInstaller EXE 실행 시: 실행 파일(exe)이 있는 폴더 기준
-        return Path(sys.executable).parent
-    else:
-        # 2. 개발(Dev) 또는 Nuitka Pyd 실행 시
-        # 이 파일(main_impl.py)은 'ui' 폴더 안에 있으므로, 
-        # 루트로 가려면 부모(ui)의 부모(root)로 두 번 올라가야 합니다.
-        # .resolve()를 써야 심볼릭 링크 등 경로 꼬임을 방지합니다.
-        return Path(__file__).resolve().parent.parent
-
-# 전역 변수로 ROOT_DIR 설정
-ROOT_DIR = get_root_dir()
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 def get_img_as_base64(file_path):
     with open(file_path, "rb") as f:
@@ -44,7 +25,6 @@ def load_auth_config():
         
         with open(config_path, encoding='utf-8') as file:
             config = yaml.load(file, Loader=SafeLoader)
-            # [수정됨] yaml 파일에 버전을 강제 주입하던 로직 삭제
             return config
     except FileNotFoundError:
         return {'enabled': False} 
@@ -56,10 +36,6 @@ def init_scheduler():
     return manager
 
 def run_snowbot():
-    """
-    메인 실행 로직
-    """
-    # 1. 아이콘 파일 경로 (ROOT_DIR 기준) 및 아이콘 로드
     ICON_PATH = ROOT_DIR / "icon.ico"
     page_icon_img = "📈"
 
@@ -71,7 +47,6 @@ def run_snowbot():
     else:
         print(f"⚠️ 아이콘 파일을 찾을 수 없음: {ICON_PATH}")
 
-    # 2. [설정 적용] Streamlit의 페이지 설정은 반드시 최상단(다른 UI 렌더링 전)에 위치해야 합니다.
     st.set_page_config(
         page_title="SnowBot",
         page_icon=page_icon_img,
@@ -154,8 +129,6 @@ def run_snowbot():
         st.session_state["authentication_status"] = True
         st.session_state["name"] = name
         st.session_state["username"] = "admin"
-
-    # --- 메인 앱 로직 ---
 
     allowed_markets = [MarketType.KR, MarketType.US]
 

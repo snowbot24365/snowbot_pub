@@ -4,7 +4,6 @@ import time
 from typing import Optional, Dict, List
 from datetime import datetime, date, timedelta
 
-# [중요] 기존 코드의 의존성 import 경로 수정
 from config.settings import get_settings_manager
 from config.database import get_session, ItemPrice, ItemEquity
 from data.kr.fnguide_fetcher import FnGuideFetcher 
@@ -65,23 +64,22 @@ class KrFetcher():
 
     def _call_api(self, tr_id: str, url: str, params: dict = None, body: dict = None, method: str = 'GET') -> Optional[Dict]:
         """
-        [수정됨] API 호출 공통 메서드 
-        1. 토큰 만료 시 자동 갱신 (Outer Loop)
-        2. 통신 오류 또는 비정상 응답 시 3회 재시도 (Inner Loop)
+        API 호출 공통 메서드
+        - 토큰 만료 시 자동 갱신 후 재시도
+        - 통신 오류 또는 비정상 응답 시 3회 재시도
         """
         if not self.is_configured(): return None
 
         time.sleep(0.5)
 
-        # [Outer Loop] 최대 2회 시도 (1회 실패 -> 토큰 갱신 -> 2회 재시도)
-        for attempt in range(2):
+        for attempt in range(2):  # 최대 2회 시도 (1회 실패 → 토큰 갱신 → 재시도)
             try:
                 headers = self._get_headers(tr_id)
                 if not headers: 
                     logger.error("헤더 생성 실패 (토큰 없음)")
                     return None
                 
-                # [Inner Loop] 통신/데이터 수신 재시도 (3회)
+                # 통신/데이터 수신 재시도 (3회)
                 # 요청하신대로 실패 시 0.5초 대기 후 재시도
                 for retry_count in range(3):
                     try:
@@ -422,7 +420,7 @@ class KrFetcher():
         KIS 관심종목 그룹 조회 API
         - TR_ID: HHKCM113004C7 (실전투자 API 전용).xlsx - 관심종목 그룹조회.csv]
         """
-        # [수정] 계좌가 아닌 'API 모드(도메인)'가 Mock인지 체크
+        # 계좌가 아닌 'API 모드(도메인)'가 Mock인지 체크
         if self.is_mock:
             logger.warning("관심종목 그룹조회는 실전투자 API(도메인) 환경에서만 지원됩니다.")
             return []

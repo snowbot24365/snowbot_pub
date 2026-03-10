@@ -13,8 +13,7 @@ from datetime import datetime, date, timedelta
 from typing import Optional, Dict, List
 from pathlib import Path
 import time
-import requests
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
 import re
 
 try:

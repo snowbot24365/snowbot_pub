@@ -129,7 +129,7 @@ def render_data_collection():
             # 실행 버튼
             if st.button("🚀 데이터 수집 실행", type="primary", width="stretch", key="btn_collect_kr", disabled=not api_ok):
 
-                # [추가] 1. 현재 UI 설정값과 저장된 설정값(c_set) 비교
+                # 1. 현재 UI 설정값과 저장된 설정값(c_set) 비교
                 is_changed = False
                 
                 # 체크박스 변경 여부 확인
@@ -143,7 +143,7 @@ def render_data_collection():
                 if collection_mode == "random_n" and random_n != c_set.kr_random_n_stocks:
                      is_changed = True
 
-                # [추가] 2. 변경사항이 있다면 실행 차단 및 경고
+                # 2. 변경사항이 있다면 실행 차단 및 경고
                 if is_changed:
                     st.warning("⚠️ 설정이 변경되었습니다. 좌측의 **[💾 KR 설정 저장]** 버튼을 먼저 눌러주세요.")
                 
@@ -294,7 +294,7 @@ def render_data_collection():
                 st.warning("⚠️ 수집할 거래소를 하나 이상 선택해주세요.")
             
             if st.button("🚀 데이터 수집 실행", type="primary", width="stretch", key="btn_collect_us", disabled=run_disabled):
-                # [추가] 1. 현재 UI 설정값과 저장된 설정값(c_set) 비교
+                # 1. 현재 UI 설정값과 저장된 설정값(c_set) 비교
                 is_changed = False
                 
                 # 체크박스 변경 여부 확인
@@ -308,7 +308,7 @@ def render_data_collection():
                 if collection_mode == "random_n" and random_n != c_set.us_random_n_stocks:
                      is_changed = True
 
-                # [추가] 2. 변경사항이 있다면 실행 차단 및 경고
+                # 2. 변경사항이 있다면 실행 차단 및 경고
                 if is_changed:
                     st.warning("⚠️ 설정이 변경되었습니다. 좌측의 **[💾 US 설정 저장]** 버튼을 먼저 눌러주세요.")
                 

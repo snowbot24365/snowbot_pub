@@ -15,7 +15,6 @@ from data.kr.evaluator import EvaluationService
 from data.us.us_collector import UsDataCollector
 from data.us.evaluator import UsEvaluationService
 
-# [수정] KR/US Trader 임포트 (AutoTrader 제거)
 from impl.kr.kr_trader import KrTrader
 from impl.us.us_trader import UsTrader
 
@@ -100,7 +99,7 @@ class SchedulerService:
                 new_schedule = ScheduleItem(
                     name=name,
                     task_type=task_type,
-                    market_type=market_type, # [신규] DB에 시장 정보 저장
+                    market_type=market_type, # DB에 시장 정보 저장
                     cron_expression=cron_expression,
                     enabled=enabled,
                     created_at=datetime.now(self.kst)
@@ -210,7 +209,7 @@ class SchedulerService:
         try:
             trigger = CronTrigger.from_crontab(item.cron_expression, timezone=self.kst)
             
-            # [수정] execute_task에 market_type 전달 추가
+            # execute_task에 market_type 전달 추가
             market_type_str = item.market_type if item.market_type else "KR"
             
             self.scheduler.add_job(
@@ -275,7 +274,7 @@ class SchedulerService:
             elif task_type == TaskType.EVALUATION:
                 logger.info(f"[{market_type}] 종목 평가 시작...")
 
-                # [수정] 시장 타입에 맞는 서비스 인스턴스 생성
+                # 시장 타입에 맞는 서비스 인스턴스 생성
                 if market_type == "US":
                     service = UsEvaluationService()
                     log_tag = "Eval-US"
@@ -401,7 +400,7 @@ class SchedulerService:
                     schedule_id=f"auto_{datetime.now().strftime('%Y%m%d%H%M%S')}",
                     schedule_name=name,
                     task_type=task_type,
-                    market_type=market_type, # [신규] 시장 정보 저장
+                    market_type=market_type, # 시장 정보 저장
                     status="running",
                     start_time=datetime.now(self.kst)
                 )

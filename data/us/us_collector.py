@@ -17,97 +17,6 @@ logger = logging.getLogger(__name__)
 
 class UsDataCollector:
     """
-    미국 주식 데이터 수집기 (개선된 버전)
-    - 종목 리스트: FinanceDataReader
-    - 상세 데이터: yfinance (Financials, Balance Sheet, Cashflow 활용)
-    """
-    def __init__(self):
-        self.settings_manager = get_settings_manager()
-        self.settings = self.settings_manager.settings.collection
-
-    def collect_stock_list(self, log_callback: Optional[Callable[[str], None]] = None) -> pd.DataFrame:
-        """미국 주요 거래소(NASDAQ, NYSE, AMEX) 종목 리스트 수집"""
-        all_dfs = []
-        
-        # 1. NASDAQ
-        if self.settings.collect_nasdaq:
-            try:
-                if log_callback: log_callback("🇺🇸 NASDAQ 종목 리스트 다운로드...")
-                df = fdr.StockListing('NASDAQ')
-                df['Market'] = 'NASDAQ'
-                limit = self.settings.nasdaq_top_n
-                if limit > 0:
-                    df = df.head(limit)
-                    if log_callback: log_callback(f"   -> NASDAQ 상위 {limit}개로 제한")
-                all_dfs.append(df)
-            except Exception as e:
-                logger.error(f"NASDAQ 리스트 실패: {e}")
-
-        # 2. NYSE
-        if self.settings.collect_nyse:
-            try:
-                if log_callback: log_callback("🇺🇸 NYSE 종목 리스트 다운로드...")
-                df = fdr.StockListing('NYSE')
-                df['Market'] = 'NYSE'
-                limit = self.settings.nyse_top_n
-                if limit > 0:
-                    df = df.head(limit)
-                    if log_callback: log_callback(f"   -> NYSE 상위 {limit}개로 제한")
-                all_dfs.append(df)
-            except Exception as e:
-                logger.error(f"NYSE 리스트 실패: {e}")
-
-        # 3. AMEX
-        if self.settings.collect_amex:
-            try:
-                if log_callback: log_callback("🇺🇸 AMEX 종목 리스트 다운로드...")
-                df = fdr.StockListing('AMEX')
-                df['Market'] = 'AMEX'
-                limit = self.settings.amex_top_n
-                if limit > 0:
-                    df = df.head(limit)
-                    if log_callback: log_callback(f"   -> AMEX 상위 {limit}개로 제한")
-                all_dfs.append(df)
-            except Exception as e:
-                logger.error(f"AMEX 리스트 실패: {e}")
-
-        if not all_dfs:
-            return pd.DataFrame()
-
-        merged_df = pd.concat(all_dfs)
-        merged_df = merged_df.drop_duplicates(subset=['Symbol'])
-
-        def normalize_ticker(ticker):
-            # 1. 우선주 공백 처리 (" PR " -> "-P")
-            ticker = ticker.replace(" PR ", "-P")
-            # 2. 일반 공백 처리 (" " -> "-")
-            ticker = ticker.replace(" ", "-")
-            # 3. 특수 케이스 (필요시 추가)
-            return ticker
-
-        merged_df['Symbol'] = merged_df['Symbol'].apply(normalize_ticker)
-
-        return merged_df
-
-    import logging
-import pandas as pd
-import FinanceDataReader as fdr
-import yfinance as yf
-from datetime import datetime, date, timedelta
-import time
-import random
-from typing import Callable, Optional, Dict, Any
-import numpy as np
-
-from config.database import (
-    get_session, ItemMst, ItemEquity, FinancialSheet, ItemPrice
-)
-from config.settings import get_settings_manager
-
-logger = logging.getLogger(__name__)
-
-class UsDataCollector:
-    """
     미국 주식 데이터 수집기
     - 종목 리스트: FinanceDataReader (NASDAQ, NYSE, AMEX)
     - 재무/기본 정보: yfinance (Yahoo Finance)
@@ -116,7 +25,6 @@ class UsDataCollector:
         self.settings_manager = get_settings_manager()
         self.settings = self.settings_manager.settings.collection
 
-    # ... (collect_stock_list 메서드는 기존과 동일하므로 생략) ...
     def collect_stock_list(self, log_callback: Optional[Callable[[str], None]] = None) -> pd.DataFrame:
         """미국 주요 거래소(NASDAQ, NYSE, AMEX) 종목 리스트 수집"""
         all_dfs = []
@@ -293,12 +201,10 @@ class UsDataCollector:
                     self._save_to_db(ticker, name, market, info, financials, balance_sheet, cashflow, collect_source)
                     
                     result['items_collected'] += 1
-                    result['financial_collected'] += 1 # yfinance는 통합 수집이라 같이 증가
+                    result['financial_collected'] += 1
                     
                 except Exception as e:
-                    # error_msg = f"{ticker} 상세 수집 실패: {e}"
                     result['errors'].append(ticker)
-                    # log(error_msg, "ERROR") # 너무 많은 로그 방지 위해 생략 가능
                     continue
                 
                 # API Rate Limit 고려 (0.5초 대기)
@@ -366,10 +272,7 @@ class UsDataCollector:
         # 1. 앞뒤 공백 제거 (안전 장치)
         ticker = ticker.strip()
         
-        # 2. 티커 중간에 공백이 있는지 체크 (예: "BRK B", "VNO PR M")
-        # 중간에 공백이 있다면 저장하지 않고 함수 종료
         if ' ' in ticker:
-            # logger.info(f"Skipping ticker with spaces: '{ticker}'")
             return
 
         today_str = date.today().strftime('%Y%m%d')
@@ -438,9 +341,7 @@ class UsDataCollector:
                 fs.revenue = safe_cast(info.get('totalRevenue')) or 0
                 fs.thtr_ntin = safe_cast(info.get('netIncomeToCommon')) or 0
                 
-                # [수정] ROE 계산 및 할당 (NaN 체크 필수)
                 avg_roe = self._calculate_avg_roe(financials, balance_sheet, 3)
-                # avg_roe가 NaN이면 info값 사용, info값도 없으면 0
                 cleaned_roe = safe_cast(avg_roe)
                 if cleaned_roe is not None:
                     fs.roe_val = cleaned_roe

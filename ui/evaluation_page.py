@@ -437,7 +437,7 @@ def render_evaluation_result_grid(market_type: MarketType, query_date: date):
                 })
                 
             if data:
-                # [수정] 컬럼을 4개로 늘려 다운로드 버튼 위치 확보
+                # 컬럼을 4개로 늘려 다운로드 버튼 위치 확보
                 c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
                 
                 with c1:
@@ -448,7 +448,7 @@ def render_evaluation_result_grid(market_type: MarketType, query_date: date):
                     avg = sum(d['총점'] for d in data) / len(data)
                     custom_metric("평균 점수", f"{avg:.1f}점")
                 
-                # [추가] 엑셀 다운로드 버튼
+                # 엑셀 다운로드 버튼
                 with c4:
                     # 1. DataFrame 생성
                     df = pd.DataFrame(data)

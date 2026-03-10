@@ -328,7 +328,7 @@ class UsFetcher():
         
         if data and data.get('rt_cd') == '0':
             output = data.get('output', {})
-            # [수정] 헬퍼 함수 사용하여 안전하게 변환
+            # 헬퍼 함수 사용하여 안전하게 변환
             return {
                 'price': self._safe_float(output.get('last')),  # USD
                 'open': self._safe_float(output.get('open')),
@@ -362,7 +362,7 @@ class UsFetcher():
         
         if data and data.get('rt_cd') == '0':
             output = data.get('output', {})
-            # [수정] 헬퍼 함수 사용하여 안전하게 변환
+            # 헬퍼 함수 사용하여 안전하게 변환
             return {
                 'price': self._safe_float(output.get('last')),  # USD
                 'open': self._safe_float(output.get('open')),
@@ -483,7 +483,7 @@ class UsFetcher():
         KIS 관심종목 그룹 조회 API
         - TR_ID: HHKCM113004C7 (실전투자 API 전용).xlsx - 관심종목 그룹조회.csv]
         """
-        # [수정] 계좌가 아닌 'API 모드(도메인)'가 Mock인지 체크
+        # 계좌가 아닌 'API 모드(도메인)'가 Mock인지 체크
         if self.is_mock:
             logger.warning("관심종목 그룹조회는 실전투자 API(도메인) 환경에서만 지원됩니다.")
             return []
@@ -621,7 +621,7 @@ class UsFetcher():
                 
                 if output:
                     # -----------------------------------------------------------
-                    # [중요] 외화(USD) 기준 vs 통합증거금(Won+USD) 기준
+                    # 외화(USD) 기준 vs 통합증거금(Won+USD) 기준
                     # 보통 '외화' 기준으로 계산하는 것이 안전합니다.
                     # -----------------------------------------------------------
                     

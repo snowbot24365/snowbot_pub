@@ -28,7 +28,7 @@ def render_settings():
     settings_manager = get_settings_manager()
     settings = settings_manager.settings
     
-    # [핵심] 현재 선택된 시장 확인 (Main에서 전달됨)
+    # 현재 선택된 시장 확인 (Main에서 전달됨)
     current_market = st.session_state.get('current_market', MarketType.KR)
     market_str = current_market.value # "KR" or "US"
     
@@ -245,7 +245,7 @@ def render_account_settings(settings_manager, settings, current_market):
     
     api = settings.api
     
-    # [수정] 현재 시장에 맞는 실행 모드 및 API 설정 로드
+    # 현재 시장에 맞는 실행 모드 및 API 설정 로드
     if current_market == MarketType.KR:
         current_mode = settings.execution_mode_kr
         trade_acct_mode = api.kis_trading_account_mode_kr
@@ -685,7 +685,7 @@ def render_trading_settings(settings_manager, settings, current_market):
     # 상세 평가 기준 설정 (Expander)
     with st.expander("🛠️ 상세 평가 기준 설정", expanded=False):
         
-        # [수정] 시장별 설정 객체 로드
+        # 시장별 설정 객체 로드
         if current_market == MarketType.KR:
             eval_config = settings.evaluation.kr
             currency_unit = "억원"
@@ -848,7 +848,7 @@ def render_trading_settings(settings_manager, settings, current_market):
             
         st.markdown("---") # 구분선
         
-        # [수정] 시가총액 단위 동적 적용
+        # 시가총액 단위 동적 적용
         st.markdown(f"**시가총액 (AVLS) - 단위: {currency_unit}**")
         av1, av2 = st.columns(2)
         with av1: 
@@ -937,7 +937,7 @@ def render_trading_settings(settings_manager, settings, current_market):
 
         st.divider()
 
-        # [신규] 3. 분할 매도 설정
+        # 3. 분할 매도 설정
         st.markdown("**📉 분할 매도 & 트레일링 스탑**")
         
         sell_split_rate = st.slider(
@@ -949,7 +949,7 @@ def render_trading_settings(settings_manager, settings, current_market):
             help="매도 신호 발생 시 보유 수량 중 처분할 비율 (100% = 전량 매도)"
         )
         
-        # [신규] 4. 트레일링 스탑 설정
+        # 4. 트레일링 스탑 설정
         ts_col1, ts_col2 = st.columns([1, 2])
         with ts_col1:
             use_ts = st.checkbox(
@@ -968,7 +968,7 @@ def render_trading_settings(settings_manager, settings, current_market):
                 help="수익 구간에서 당일 고점 대비 N% 하락 시 이익 실현"
             )
         
-        # [수정] fee_rate와 tax_rate 초기값 설정 (시뮬레이션 모드가 아닐 때를 대비)
+        # fee_rate와 tax_rate 초기값 설정 (시뮬레이션 모드가 아닐 때를 대비)
         fee_rate = t_settings.fee_rate
         tax_rate = t_settings.tax_rate
 
@@ -1077,7 +1077,7 @@ def get_virtual_account(market: MarketType):
                 market_type=market.value
             ).filter(VirtualHolding.quantity > 0).all()
             
-            # [수정] Fetcher 선택 (KR / US)
+            # Fetcher 선택 (KR / US)
             fetcher = None
             if market == MarketType.KR:
                 fetcher = KrFetcher()

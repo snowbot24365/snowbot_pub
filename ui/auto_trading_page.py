@@ -20,7 +20,7 @@ from scheduler.task_manager import get_scheduler, TaskType
 from core.definition import MarketType
 from utils.common import custom_metric
 
-# [수정] Trader 및 Fetcher 임포트
+# Trader 및 Fetcher 임포트
 from impl.kr.kr_trader import KrTrader
 from impl.us.us_trader import UsTrader
 from impl.kr.kr_fetcher import KrFetcher
@@ -219,7 +219,7 @@ def render_auto_trading():
     st.divider()
 
     # ========== 실행 로그 ==========
-    # [수정] key_suffix 추가하여 키 중복 방지
+    # key_suffix 추가하여 키 중복 방지
     render_log_section("auto_trade", f"📜 {market_str} 최근 실행 로그", key_suffix=market_str)
     
 
@@ -249,7 +249,7 @@ def run_auto_trading_logic(account_type: str, current_market: MarketType):
         
         progress_bar.progress(10)
         
-        # [핵심] 시장에 맞는 Trader 생성
+        # 시장에 맞는 Trader 생성
         trader = None
         if current_market == MarketType.KR:
             trader = KrTrader()

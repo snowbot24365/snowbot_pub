@@ -408,7 +408,7 @@ class DataCollectionService:
                 log("종목 목록 수집 실패 (데이터 없음)", "ERROR")
                 return result
             
-            # [중요] 설정에 따른 수집 대상 필터링 (DB 저장 단계에서 제한)
+            # 설정에 따른 수집 대상 필터링 (DB 저장 단계에서 제한)
             if settings.kr_collection_mode == "random_n":
                 total_count = len(all_items)
                 target_count = min(settings.kr_random_n_stocks, len(all_items))
@@ -435,7 +435,7 @@ class DataCollectionService:
                         'mrkt_ctg': item.mrkt_ctg
                     })
             
-            # [중요] 이미 DB에 전체 데이터가 있는데 '무작위 N개'로 모드를 변경한 경우 대비
+            # 이미 DB에 전체 데이터가 있는데 '무작위 N개'로 모드를 변경한 경우 대비
             if settings.kr_collection_mode == "random_n":
                 limit_n = settings.kr_random_n_stocks
                 if len(target_items) > limit_n:
@@ -579,7 +579,7 @@ class DataCollectionService:
                     )
                     session.add(sheet)
                 
-                # [수정] 모든 필드 할당 시 safe_cast 적용
+                # 모든 필드 할당 시 safe_cast 적용
                 # 값이 없거나 NaN이면 None(NULL)으로 저장되거나 0으로 저장 (로직에 따라 선택)
                 
                 # 비율(Rate) 데이터 - 없는 경우 0.0 처리? or None 유지?

@@ -4,17 +4,10 @@ import requests
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Optional, Dict, Any
-import sys
 
 logger = logging.getLogger(__name__)
 
-if getattr(sys, 'frozen', False):
-    # 1. EXE 실행 모드: 실행 파일(.exe)이 있는 폴더를 기준(ROOT)으로 잡음
-    ROOT_DIR = Path(sys.executable).parent
-else:
-    # 2. 개발(Script) 모드: 현재 파일의 위치를 기준으로 상위 폴더를 잡음
-    # (기존 코드: Path(__file__).parent.parent)
-    ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 # 토큰 저장 경로
 TOKEN_DIR = ROOT_DIR / "config_data"

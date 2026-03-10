@@ -249,7 +249,7 @@ def render_holdings_detail(settings_manager, account_type, current_market):
                 eval_amt = item['eval_amt']
                 profit_rate = item['profit_rate']
 
-            # [핵심] URL 생성
+            # URL 생성
             if current_market == MarketType.KR:
                 full_url = f"https://finance.naver.com/item/main.naver?code={code}"
             else:

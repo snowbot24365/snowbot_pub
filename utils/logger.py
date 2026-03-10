@@ -52,7 +52,7 @@ def setup_logger(
             filename=filename,
             when="midnight",    # 자정마다 파일 교체
             interval=1,         # 1일 간격
-            backupCount=retention_days, # [핵심] 보관할 파일 개수 (30개가 넘으면 옛날 것 자동 삭제)
+            backupCount=retention_days, # 보관할 파일 개수 (30개가 넘으면 옛날 것 자동 삭제)
             encoding='utf-8'
         )
         
@@ -86,5 +86,5 @@ def get_logger(name: str = None) -> logging.Logger:
     return logging.getLogger()
 
 
-# [중요] 모듈 임포트 시점에 즉시 실행되어 Root Logger 설정을 완료함
+# 모듈 임포트 시점에 즉시 실행되어 Root Logger 설정을 완료함
 default_logger = setup_logger()

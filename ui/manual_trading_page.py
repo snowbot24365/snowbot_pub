@@ -104,7 +104,7 @@ def get_buy_candidates(settings_manager, current_market):
             # ---------------------------------------------------------
             # 1. 사용자 지정 관심종목 조회 (UserBuyTarget - 시장 필터)
             # ---------------------------------------------------------
-            # [수정] ItemMst와 조인하여 mrkt_ctg 조회
+            # ItemMst와 조인하여 mrkt_ctg 조회
             user_targets = session.query(UserBuyTarget, ItemMst.mrkt_ctg).outerjoin(
                 ItemMst, UserBuyTarget.item_cd == ItemMst.item_cd
             ).filter(
@@ -129,7 +129,7 @@ def get_buy_candidates(settings_manager, current_market):
                 candidates_map[t.item_cd] = {
                     'item_cd': t.item_cd,
                     'item_nm': t.item_nm,
-                    'market_ctg': final_market_ctg or "", # [추가] 시장 구분 (KOSPI, NASDAQ 등)
+                    'market_ctg': final_market_ctg or "", # 시장 구분 (KOSPI, NASDAQ 등)
                     'total_score': 0, 
                     'is_candidate': False, 
                     'ref_price': yesterday_close,
@@ -172,7 +172,7 @@ def get_buy_candidates(settings_manager, current_market):
                 else:
                     min_score = settings_manager.settings.evaluation.us.min_total_score
                 
-                # [수정] ItemMst와 조인하여 mrkt_ctg 조회
+                # ItemMst와 조인하여 mrkt_ctg 조회
                 results = session.query(EvaluationResult, ItemMst.mrkt_ctg).join(
                     ItemMst, EvaluationResult.item_cd == ItemMst.item_cd
                 ).filter(
@@ -201,8 +201,7 @@ def get_buy_candidates(settings_manager, current_market):
                         candidates_map[r.item_cd] = {
                             'item_cd': r.item_cd,
                             'item_nm': r.item_nm,
-                            'market_ctg': mrkt_ctg or "", # [추가]
-                            'total_score': r.total_score,
+                            'market_ctg': mrkt_ctg or "", # 'total_score': r.total_score,
                             'is_candidate': r.is_buy_candidate,
                             'ref_price': yesterday_close,
                             'source': '📊추천'

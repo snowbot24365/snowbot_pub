@@ -164,7 +164,7 @@ class UsEvaluator:
             w.weight_per + w.weight_pbr
         )
         
-        # [핵심] 점수 정규화: (가중평균) * (항목 수 8)
+        # 점수 정규화: (가중평균) * (항목 수 8)
         # 이렇게 하면 가중치를 3.0으로 높여도 만점은 항상 40점으로 유지됨
         if total_weight > 0:
             final_score = (w_sum / total_weight) * 8

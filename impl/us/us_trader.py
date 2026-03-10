@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, date, timedelta
 import time
 import pandas as pd
-import yfinance as yf # [추가] yfinance 임포트
+import yfinance as yf # yfinance 임포트
 import pytz
 
 from core.base_trader import BaseTrader
@@ -182,7 +182,7 @@ class UsTrader(BaseTrader):
         use_loss_cut = getattr(cfg, 'use_loss_cut', True)        # 손절 사용 여부
         max_buy_amt = getattr(cfg, 'max_buy_amount', 1000)
         
-        # [신규] 트레일링 스탑 설정
+        # 트레일링 스탑 설정
         use_ts = getattr(cfg, 'trailing_stop_enabled', False)
         ts_rate = getattr(cfg, 'trailing_stop_rate', 3.0) # 고점 대비 3% 하락 시 매도
 
@@ -340,7 +340,7 @@ class UsTrader(BaseTrader):
                             logger.error(f"Sim Sell Fail: {sim_result.message}")                    
         return logs
     
-    # [수정] 미국 주식용 날짜 계산 함수
+    # 미국 주식용 날짜 계산 함수
     def get_trading_date(self, market_type='US'):
         now = datetime.now()
         
@@ -416,7 +416,7 @@ class UsTrader(BaseTrader):
             user_targets = session.query(UserBuyTarget).filter_by(market_type='US').all()
             
             # C. [우선순위 2] 보유 중인 종목 중 추가 매수 가능 종목 (DB 조회 X)
-            # [수정] EvaluationResult 조회 없이 잔고 정보를 바탕으로 직접 후보 객체 생성
+            # EvaluationResult 조회 없이 잔고 정보를 바탕으로 직접 후보 객체 생성
             holding_candidates = []
             if fillable_codes:
                 for h in holdings:
@@ -427,7 +427,7 @@ class UsTrader(BaseTrader):
                     except (ValueError, TypeError):
                         current_qty = 0
 
-                    # [수정] 코드가 목록에 있고 AND 수량이 0보다 클 때만 처리
+                    # 코드가 목록에 있고 AND 수량이 0보다 클 때만 처리
                     if code in fillable_codes and current_qty > 0:
                         # SQLAlchemy 객체와 호환되도록 SimpleNamespace 사용
                         # 점수는 없으므로 0점 처리하지만, 매수 로직은 진행됨
@@ -484,7 +484,7 @@ class UsTrader(BaseTrader):
             for cand in candidates:
                 if cand.item_cd in today_bought_codes: continue
                 
-                # [중요] 신규 종목 진입 제한 확인
+                # 신규 종목 진입 제한 확인
                 # 현재 보유중이지 않은 종목(신규)인데 슬롯이 없다면 건너뜀
                 is_new_stock = cand.item_cd not in fillable_codes # fillable에 없으면 신규로 간주
                 if is_new_stock and slots_available <= 0:
@@ -519,7 +519,7 @@ class UsTrader(BaseTrader):
                     continue
                 
                 # =========================================================
-                # [수정] yfinance 기반 Pivot 지지선 확인
+                # yfinance 기반 Pivot 지지선 확인
                 # =========================================================
                 buy_criteria = getattr(self.trade_cfg, 'buy_price_criteria', 'current')
                 if buy_criteria == 'current':
